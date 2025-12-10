@@ -59,8 +59,14 @@ public class Controller {
         String message = repo.findByUuid(uuid)
                 .map(SecretMessage::getMessage)
                 .orElse(null);
+        Boolean selfdelete = repo.findByUuid(uuid)
+                .map(SecretMessage::getSelfdelete)
+                .orElse(null);
         if (encoder.matches(request.get("password"), password)) {
             System.out.println(message);
+            if (selfdelete) {
+                repo.findByUuid(uuid).ifPresent(repo::delete);
+            }
             return message;
         }
         return "Password is wrong!";
