@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -25,18 +26,14 @@ public class SecretMessage {
     private String message;
 
     private String password;
-    private int expirationDay;
-    private int expirationHour;
-    private int expirationMinute;
+    private LocalDateTime expireAt;
     private Boolean selfdelete;
 
-    public SecretMessage(String message, String password, int expirationDay, int expirationHour, int expirationMinute, Boolean selfdelete, String uuid) {
+    public SecretMessage(String message, String password, LocalDateTime expireAt, Boolean selfdelete, String uuid) {
         this.uuid = uuid;
         this.message = message;
         this.password = password;
-        this.expirationDay = expirationDay;
-        this.expirationHour = expirationHour;
-        this.expirationMinute = expirationMinute;
+        this.expireAt = expireAt;
         this.selfdelete = selfdelete;
     }
 

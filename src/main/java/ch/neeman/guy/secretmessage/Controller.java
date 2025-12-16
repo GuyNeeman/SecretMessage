@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,18 +31,14 @@ public class Controller {
         String message = request.get("message");
         String password = encoder.encode(request.get("password"));
 
-        int expirationDay = Integer.parseInt(request.get("expirationday"));
-        int expirationHour = Integer.parseInt(request.get("expirationhour"));
-        int expirationMinute = Integer.parseInt(request.get("expirationminute"));
+        LocalDateTime expireAt = LocalDateTime.now().plusMinutes(Integer.parseInt(request.get("expirationminute")));
         Boolean selfdelete = Boolean.valueOf(request.get("selfdelete"));
         String uuid = UUID.randomUUID().toString();
 
         SecretMessage msg = new SecretMessage(
                 message,
                 password,
-                expirationDay,
-                expirationHour,
-                expirationMinute,
+                expireAt,
                 selfdelete,
                 uuid
         );
@@ -63,7 +60,6 @@ public class Controller {
                 .map(SecretMessage::getSelfdelete)
                 .orElse(null);
         if (encoder.matches(request.get("password"), password)) {
-            System.out.println(message);
             if (selfdelete) {
                 repo.findByUuid(uuid).ifPresent(repo::delete);
             }
@@ -71,4 +67,18 @@ public class Controller {
         }
         return "Password is wrong!";
     }
+
+    @PostMapping("/checkExistance/{uuid}")
+    public ResponseEntity<String> checkExistance(@PathVariable String uuid) {
+        return repo.findByUuid(uuid)
+                .map(secretMessage -> {
+                    if (LocalDateTime.now().isAfter(secretMessage.getExpireAt())) {
+                        repo.delete(secretMessage);
+                        return ResponseEntity.status(410).body("Message has expired!");
+                    }
+                    return ResponseEntity.ok("Message exists!");
+                })
+                .orElseGet(() -> ResponseEntity.status(404).body("Message not found"));
+    }
+
 }

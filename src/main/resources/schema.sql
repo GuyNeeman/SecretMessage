@@ -5,9 +5,7 @@ CREATE TABLE `message` (
                            `uuid` VARCHAR(64) NOT NULL,
                            `message` TEXT NOT NULL,
                            `password` VARCHAR(255),
-                           `expiration_day` INT(2),
-                           `expiration_hour` INT(2),
-                           `expiration_minute` INT(3),
+                           `expiresat` INT(10),
                            `selfdelete` BOOLEAN NOT NULL,
                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
