@@ -7,5 +7,6 @@ CREATE TABLE `message` (
                            `password` VARCHAR(255),
                            `expiresat` INT(10),
                            `selfdelete` BOOLEAN NOT NULL,
+                           `language` TEXT,
                            PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

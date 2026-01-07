@@ -29,12 +29,15 @@ public class SecretMessage {
     private LocalDateTime expireAt;
     private Boolean selfdelete;
 
-    public SecretMessage(String message, String password, LocalDateTime expireAt, Boolean selfdelete, String uuid) {
+    private String language;
+
+    public SecretMessage(String message, String password, LocalDateTime expireAt, Boolean selfdelete, String uuid, String language) {
         this.uuid = uuid;
         this.message = message;
         this.password = password;
         this.expireAt = expireAt;
         this.selfdelete = selfdelete;
+        this.language = language;
     }
 
 }

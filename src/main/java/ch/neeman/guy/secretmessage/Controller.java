@@ -32,6 +32,8 @@ public class Controller {
         String message = request.get("message");
         String password = encoder.encode(request.get("password"));
 
+        String language = request.get("language");
+
         Boolean selfdelete = Boolean.valueOf(request.get("selfdelete"));
         LocalDateTime expireAt;
         if (selfdelete) {
@@ -46,7 +48,8 @@ public class Controller {
                 password,
                 expireAt,
                 selfdelete,
-                uuid
+                uuid,
+                language
         );
 
         SecretMessage saved = repo.save(msg);
@@ -55,7 +58,7 @@ public class Controller {
     }
 
     @PostMapping("/showmessage/{uuid}")
-    public String showMessage(@PathVariable String uuid, @RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> showMessage(@PathVariable String uuid, @RequestBody Map<String, String> request) {
         String password = repo.findByUuid(uuid)
                 .map(SecretMessage::getPassword)
                 .orElse(null);
@@ -65,13 +68,19 @@ public class Controller {
         Boolean selfdelete = repo.findByUuid(uuid)
                 .map(SecretMessage::getSelfdelete)
                 .orElse(null);
+        String language = repo.findByUuid(uuid)
+                .map(SecretMessage::getLanguage)
+                .orElse(null);
         if (encoder.matches(request.get("password"), password)) {
             if (selfdelete) {
                 repo.findByUuid(uuid).ifPresent(repo::delete);
             }
-            return message;
+            return ResponseEntity.ok(Map.of(
+                    "message", message,
+                    "language", language
+            ));
         }
-        return "Password is wrong!";
+        return ResponseEntity.status(403).body(Map.of("error", "Password is wrong!"));
     }
 
     @PostMapping("/checkExistance/{uuid}")
